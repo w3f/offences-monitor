@@ -47,10 +47,10 @@ const main = async (endpoint = LocalProvider) => {
       const { event } = record;
 
       if (event.section === 'offences') {
-        const offenseKind = event.data[0];
+        const offenceKind = event.data[0];
 
         /// Store in memory. TODO: Replace this with `prom-client`.
-        Report[offenseKind] = {
+        Report[offenceKind] = {
           sessionIndex: event.data[1],
           timeSlot: event.data[2],
         }
