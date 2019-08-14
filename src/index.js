@@ -1,18 +1,12 @@
-const express = require('express');
-
 const { ApiPromise, WsProvider } = require('@polkadot/api');
+const express = require('express');
+const prom = require('./promClient');
 
-// const OFFENSE_TYPES = {
-//   Kind: 0,
-//   SessionIndex: 1,
-//   TimeSlot: 2,
-// }
-
-// const Offences = {
-//   BabeEquivocation: 'babe:equivocatio',
-//   GrandpaEquivocation: 'grandpa:equivoca',
-//   Unresponsiveness: 'im-online:offlin',
-// }
+const Offences = {
+  BabeEquivocation: 'babe:equivocatio',
+  GrandpaEquivocation: 'grandpa:equivoca',
+  Unresponsiveness: 'im-online:offlin',
+}
 
 const Report = {};
 
@@ -27,14 +21,11 @@ app.get('/report', (req, res) => {
   res.send(Report);
 });
 
-// app.get('/test', (req, res) => {
-//   Report[Offences.Unresponsiveness] = {
-//     sessionIndex: 2,
-//     timeSlot: 44,
-//   };
-// });
-
 const main = async (endpoint = LocalEndpoint) => {
+  prom.injectMetricsRoute(app);
+  prom.startCollection();
+
+  // FIXME: Pull the following monitoring code to its own file.
   console.log(`Starting events monitor watching endpoint: ${endpoint}`);
 
   const provider = new WsProvider(endpoint);
@@ -47,13 +38,28 @@ const main = async (endpoint = LocalEndpoint) => {
       const { event } = record;
 
       if (event.section === 'offences') {
-        const offenceKind = event.data[0];
+        const [offenceKind, sessionIndex, timeSlot] = event.data;
 
-        /// Store in memory. TODO: Replace this with `prom-client`.
+        /// Store in memory. Useful for JSON dumps ¯\_(ツ)_/¯.
         Report[offenceKind] = {
-          sessionIndex: event.data[1],
-          timeSlot: event.data[2],
+          sessionIndex,
+          timeSlot,
         }
+
+        switch (offenceKind) {
+          case Offences.BabeEquivocation: 
+            prom.babeEquivocations.inc(1, new Date());
+            break;
+          case Offences.GrandpaEquivocation:
+            prom.grandpaEquivocations.inc(1, new Date());
+            break;
+          case Offences.Unresponsiveness:
+            prom.unresponsivenessReports.inc(1, new Date());
+            break;
+        }
+
+        /// Observe the session index has had an offence reported.
+        prom.sessionIndex.observe(sessionIndex);
       }
     })
   });

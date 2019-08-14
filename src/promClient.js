@@ -27,10 +27,17 @@ const unresponsivenessReports = new promClient.Counter({
   help: 'The number of unresponsiveness reports and when.'
 });
 
+const sessionIndex = new promClient.Histogram({
+  name: 'offences_session_index',
+  help: 'The number of offences reported per each sessionIndex.',
+  labelNames: ['sessionIndex'],
+});
+
 module.exports = {
   startCollection,
   injectMetricsRoute,
   babeEquivocations,
   grandpaEquivocations,
-  unresponsiveness,
+  unresponsivenessReports,
+  sessionIndex,
 };
