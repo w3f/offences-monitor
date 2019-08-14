@@ -34,7 +34,7 @@ app.get('/report', (req, res) => {
 //   };
 // });
 
-const main = async (endpoint = LocalProvider) => {
+const main = async (endpoint = LocalEndpoint) => {
   console.log(`Starting events monitor watching endpoint: ${endpoint}`);
 
   const provider = new WsProvider(endpoint);
