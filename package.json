@@ -1,0 +1,25 @@
+{
+  "name": "offences-monitor",
+  "version": "1.0.0",
+  "description": "Monitors slashable offences registered on a Substrate based chain.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "substrate",
+    "polkadot",
+    "kusama",
+    "blockchain",
+    "monitoring"
+  ],
+  "author": "Web3 Foundation",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@polkadot/api": "^0.90.0-beta.55",
+    "bs58": "^4.0.1",
+    "express": "^4.17.1",
+    "prom-client": "^11.5.3"
+  }
+}
