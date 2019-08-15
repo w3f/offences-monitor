@@ -1,4 +1,5 @@
 const promClient = require('prom-client');
+const { register } = promClient;
 
 const startCollection = () => {
   console.log('Starting the collection of metrics, the metrics are available on /metrics');
