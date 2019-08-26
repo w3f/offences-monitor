@@ -26,3 +26,23 @@ jobs:
 
       # run tests!
       - run: yarn test
+
+  buildImage:
+    docker:
+      - image: web3f/ci-commons:v1.3.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          command: |
+            /scripts/build-image.sh web3f/offences-monitor .
+
+  publishImage:
+    docker:
+      - image: web3f/ci-commons:v1.3.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          command: |
+            /scripts/publish-image.sh web3f/offences-monitor
