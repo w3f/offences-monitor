@@ -2,13 +2,23 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 const express = require('express');
 const prom = require('./promClient');
 
-const Offences = {
-  BabeEquivocation: 'babe:equivocatio',
-  GrandpaEquivocation: 'grandpa:equivoca',
-  Unresponsiveness: 'im-online:offlin',
+String.prototype.hexEncode = function(){
+  let result = '';
+
+  for (let i = 0; i < this.length; i++) {
+    result += this.charCodeAt(i).toString(16);
+  }
+
+  return result;
 }
 
-const Report = {};
+const Offences = {
+  BabeEquivocation: 'babe:equivocatio'.hexEncode(),
+  GrandpaEquivocation: 'grandpa:equivoca'.hexEncode(),
+  Unresponsiveness: 'im-online:offlin'.hexEncode(),
+}
+
+const Report = [];
 
 /// Express
 const app = express();
@@ -17,7 +27,7 @@ const port = 5555;
 /// Polkadot API Endpoint
 const LocalEndpoint = 'ws://localhost:9944';
 
-app.get('/report', (req, res) => {
+app.get('/report', (_, res) => {
   res.send(Report);
 });
 
@@ -41,12 +51,13 @@ const main = async (endpoint = LocalEndpoint) => {
         const [offenceKind, sessionIndex, timeSlot] = event.data;
 
         /// Store in memory. Useful for JSON dumps ¯\_(ツ)_/¯.
-        Report[offenceKind] = {
+        Report.push({
+          offenceKind,
           sessionIndex,
           timeSlot,
-        }
+        });
 
-        switch (offenceKind) {
+        switch (offenceKind.toString().slice(2)) {
           case Offences.BabeEquivocation: 
             prom.babeEquivocations.inc();
             break;
