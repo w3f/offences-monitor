@@ -48,18 +48,15 @@ const main = async (endpoint = LocalEndpoint) => {
 
         switch (offenceKind) {
           case Offences.BabeEquivocation: 
-            prom.babeEquivocations.inc(1, new Date());
+            prom.babeEquivocations.inc();
             break;
           case Offences.GrandpaEquivocation:
-            prom.grandpaEquivocations.inc(1, new Date());
+            prom.grandpaEquivocations.inc();
             break;
           case Offences.Unresponsiveness:
-            prom.unresponsivenessReports.inc(1, new Date());
+            prom.unresponsivenessReports.inc();
             break;
         }
-
-        /// Observe the session index has had an offence reported.
-        prom.sessionIndex.observe(sessionIndex);
       }
     })
   });

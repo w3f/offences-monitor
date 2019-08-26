@@ -14,24 +14,18 @@ const injectMetricsRoute = (app) => {
 }
 
 const babeEquivocations = new promClient.Counter({
-  name: 'babe_equivocations',
+  name: 'offences_monitor_babe_equivocations_total',
   help: 'The number of babe equivocations and when.'
 });
 
 const grandpaEquivocations = new promClient.Counter({
-  name: 'grandpa_equivocations',
+  name: 'offences_monitor_grandpa_equivocations_total',
   help: 'The number of grandpa equivocations and when.'
 });
 
 const unresponsivenessReports = new promClient.Counter({
-  name: 'unresponsiveness_report',
+  name: 'offences_monitor_unresponsiveness_report_total',
   help: 'The number of unresponsiveness reports and when.'
-});
-
-const sessionIndex = new promClient.Histogram({
-  name: 'offences_session_index',
-  help: 'The number of offences reported per each sessionIndex.',
-  labelNames: ['sessionIndex'],
 });
 
 module.exports = {
@@ -40,5 +34,4 @@ module.exports = {
   babeEquivocations,
   grandpaEquivocations,
   unresponsivenessReports,
-  sessionIndex,
 };
