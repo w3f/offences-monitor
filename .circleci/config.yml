@@ -53,5 +53,8 @@ workflows:
     jobs:
       - buildImage
       - publishImage:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
           requires:
             - buildImage
