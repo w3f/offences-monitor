@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/w3f/offences-monitor.svg?style=svg)](https://circleci.com/gh/w3f/offences-monitor)
+
 # Offences Monitor
 
 Monitors slashable offences that are registered through the Offences module on a Substrate based chain.
