@@ -35,7 +35,7 @@ jobs:
       - setup_remote_docker
       - run:
           command: |
-            /scripts/build-image.sh web3f/offences-monitor .
+            /scripts/build-image.sh lsaether/offences-monitor .
 
   publishImage:
     docker:
@@ -45,10 +45,11 @@ jobs:
       - setup_remote_docker
       - run:
           command: |
-            /scripts/publish-image.sh web3f/offences-monitor
+            /scripts/publish-image.sh lsaether/offences-monitor
 
 workflows:
   version: 2
   test_and_deploy: 
     jobs:
       - buildImage
+      - publishImage
