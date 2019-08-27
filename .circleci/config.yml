@@ -52,4 +52,6 @@ workflows:
   test_and_deploy: 
     jobs:
       - buildImage
-      - publishImage
+      - publishImage:
+          requires:
+            - buildImage
