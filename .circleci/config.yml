@@ -46,3 +46,12 @@ jobs:
       - run:
           command: |
             /scripts/publish-image.sh web3f/offences-monitor
+
+workflows:
+  version: 2
+  test_and_deploy: 
+    jobs:
+      - buildImage:
+        filters:
+          tags:
+            only: /.*/
