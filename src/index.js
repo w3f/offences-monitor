@@ -18,18 +18,12 @@ const Offences = {
   Unresponsiveness: 'im-online:offlin'.hexEncode(),
 }
 
-const Report = [];
-
 /// Express
 const app = express();
 const port = 5555;
 
 /// Polkadot API Endpoint
 const LocalEndpoint = 'ws://localhost:9944';
-
-app.get('/report', (_, res) => {
-  res.send(Report);
-});
 
 const main = async (endpoint = LocalEndpoint) => {
   prom.injectMetricsRoute(app);
@@ -44,30 +38,36 @@ const main = async (endpoint = LocalEndpoint) => {
   /// Subscribe to all events...
   api.query.system.events((events) => {
     // ... but only filter the ones we care about -- offences.
-    events.forEach((record) => {
+    events.forEach(async (record) => {
       const { event } = record;
 
       if (event.section === 'offences') {
-        const [offenceKind, sessionIndex, timeSlot] = event.data;
+        const [offenceKind, timeSlot] = event.data;
 
-        /// Store in memory. Useful for JSON dumps ¯\_(ツ)_/¯.
-        Report.push({
-          offenceKind,
-          sessionIndex,
-          timeSlot,
+        const reportsByKind = await api.query.offences.reportsByKindIndex(offenceKind);
+
+        // FIXME: Do actual SCALE decoding. Since reportByKind currently gives us one large string.
+        const beginIndex = reportsByKind.toString().indexOf('00');
+        const reports = reportsByKind.toString().slice(beginIndex).match(/.{1,72}/g)
+        const currentReports = reports.filter((reportDetails) => reportDetails.startsWith(timeSlot.toString().slice(2)));
+        currentReports.forEach(async (reportId) => {
+          reportId = reportId.slice(timeSlot.toString().length-2)
+          const reportInfo = await api.query.offences.reports('0x' + reportId);
+          const { offender/*, reporters*/ } = reportInfo.raw;
+          const [offenderAddress/*, offenderDeets*/] = offender;
+          
+          switch (offenceKind.toString().slice(2)) {
+            case Offences.BabeEquivocation: 
+              prom.babeEquivocations.inc({ offenderAddress });
+              break;
+            case Offences.GrandpaEquivocation:
+              prom.grandpaEquivocations.inc({ offenderAddress });
+              break;
+            case Offences.Unresponsiveness:
+              prom.unresponsivenessReports.inc({ offenderAddress });
+              break;
+          }
         });
-
-        switch (offenceKind.toString().slice(2)) {
-          case Offences.BabeEquivocation: 
-            prom.babeEquivocations.inc();
-            break;
-          case Offences.GrandpaEquivocation:
-            prom.grandpaEquivocations.inc();
-            break;
-          case Offences.Unresponsiveness:
-            prom.unresponsivenessReports.inc();
-            break;
-        }
       }
     })
   });
