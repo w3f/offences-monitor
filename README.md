@@ -20,3 +20,4 @@ The monitor will use the endpoint of a locally running chain at `ws://localhost:
 ```zsh
 $ yarn start wss://kusama-rpc.polkadot.io
 ```
+test
